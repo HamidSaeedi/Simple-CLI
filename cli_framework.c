@@ -1,4 +1,10 @@
 #include "cli_framework.h"
+#include <stdio.h>
+
+// Internal wrapper function to match IO_GetCharFunc signature
+static char stdio_getchar_wrapper(void) {
+    return (char)getchar();
+}
 
 // Initialize CLI with default values
 void cli_init(CLI* cli, const char* prompt) {
@@ -129,11 +135,16 @@ char* cli_read_line(CLI* cli) {
     int pos = 0;
     char c;
     
-    // Use stdio if no custom getchar function is set
-    IO_GetCharFunc getchar_fn = cli->getchar_func ? cli->getchar_func : getchar;
+    // Use custom function or fallback to stdio wrapper
+    IO_GetCharFunc getchar_fn = cli->getchar_func ? cli->getchar_func : stdio_getchar_wrapper;
     
     while (1) {
         c = getchar_fn();
+        
+        // Handle EOF (Ctrl+D)
+        if (c == (char)EOF) {
+            return strdup("exit"); // Exit on EOF
+        }
         
         // Handle backspace
         if (c == '\b' || c == 127) {

@@ -24,30 +24,14 @@ void custom_print(const char* str) {
     printf("%s", str);
 }
 
-// Custom IO function 2: Get char from stdin
+// Custom IO function 2: Get char from stdin (with proper signature)
 char custom_getchar(void) {
-    return getchar();
+    return (char)getchar(); // Cast to match IO_GetCharFunc
 }
 
-// Custom IO function 3: Check if char available (for non-blocking)
+// Custom IO function 3: Check if char available
 int custom_char_available(void) {
     return 1; // Always available for stdin
-}
-
-// Another set of IO functions (example for different hardware)
-void uart_print(const char* str) {
-    // This would send to UART in real implementation
-    printf("[UART] %s", str);
-}
-
-char uart_getchar(void) {
-    // This would read from UART in real implementation
-    return getchar();
-}
-
-int uart_char_available(void) {
-    // Check UART status
-    return 1;
 }
 
 int main() {
@@ -56,22 +40,14 @@ int main() {
     // Initialize CLI
     cli_init(&cli, "myapp");
     
-    // Set custom IO functions - YOU CAN CHANGE THESE ANYTIME!
+    // Set custom IO functions
     cli_set_io_functions(&cli, custom_print, custom_getchar, custom_char_available);
     
     // Add commands
     cli_add_command(&cli, "time", "Get current time", cmd_time);
     cli_add_command(&cli, "echo", "Echo arguments", cmd_echo);
     
-    // Start CLI with current IO functions
-    printf("Using custom IO functions:\n");
-    cli_start(&cli);
-    
-    // Now let's change the IO functions!
-    printf("\nChanging to UART IO functions:\n");
-    cli_set_io_functions(&cli, uart_print, uart_getchar, uart_char_available);
-    
-    // Restart CLI with new IO functions
+    // Start CLI
     cli_start(&cli);
     
     // Cleanup
